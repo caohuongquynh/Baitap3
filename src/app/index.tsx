@@ -6,7 +6,11 @@ export default function HomeScreen() {
   const [screen, setScreen] = useState(1);
   const [userName, setUserName] = useState("");
   const [mssv, setMssv] = useState("");
-  const [errors, setErrors] = useState({ userName: false, mssv: false });
+  const [errors, setErrors] = useState({
+    userName: false,
+    mssv: false,
+    mssvFormat: false,
+  });
 
   if (screen === 2) {
     return (
@@ -14,6 +18,7 @@ export default function HomeScreen() {
         <Pressable style={styles.backButton} onPress={() => setScreen(1)}>
           <Text style={styles.backArrow}>←</Text>
         </Pressable>
+
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>Name: {userName}</Text>
           <Text style={styles.infoText}>Student ID: {mssv}</Text>
@@ -28,6 +33,7 @@ export default function HomeScreen() {
         <View style={[styles.box, { backgroundColor: "#1E88E5" }]}>
           <Text style={[styles.textNumber, { color: "#FFFFFF" }]}>1</Text>
         </View>
+
         <View style={[styles.box, { backgroundColor: "#E53935" }]}>
           <Text style={[styles.textNumber, { color: "#FFFFFF" }]}>2</Text>
         </View>
@@ -37,6 +43,7 @@ export default function HomeScreen() {
         <View style={[styles.box, { backgroundColor: "#FDD835" }]}>
           <Text style={[styles.textNumber, { color: "#000000" }]}>3</Text>
         </View>
+
         <View style={[styles.box, { backgroundColor: "#43A047" }]}>
           <Text style={[styles.textNumber, { color: "#FFFFFF" }]}>4</Text>
         </View>
@@ -49,8 +56,11 @@ export default function HomeScreen() {
       <View style={[styles.box, { flex: 1.8, backgroundColor: "#FB8C00" }]}>
         <Text style={[styles.textNumber, { color: "#FFFFFF" }]}>6</Text>
       </View>
+
       <View style={{ flex: 1 }} />
+
       <Text style={styles.studentInfo}>Nhap thong tin sinh vien</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Enter your name"
@@ -58,10 +68,14 @@ export default function HomeScreen() {
         value={userName}
         onChangeText={(value) => {
           setUserName(value);
-          setErrors((current) => ({ ...current, userName: false }));
+          setErrors((current) => ({
+            ...current,
+            userName: false,
+          }));
         }}
         autoCapitalize="none"
       />
+
       <TextInput
         style={styles.input}
         placeholder="Enter your student ID"
@@ -69,24 +83,47 @@ export default function HomeScreen() {
         value={mssv}
         onChangeText={(value) => {
           setMssv(value);
-          setErrors((current) => ({ ...current, mssv: false }));
+          setErrors((current) => ({
+            ...current,
+            mssv: false,
+            mssvFormat: false,
+          }));
         }}
       />
+
       {errors.mssv ? (
         <Text style={styles.errorText}>Vui lòng nhập MSSV.</Text>
       ) : null}
+
+      {errors.mssvFormat ? (
+        <Text style={styles.errorText}>MSSV không đúng định dạng.</Text>
+      ) : null}
+
       {errors.userName ? (
         <Text style={styles.errorText}>Vui lòng nhập UserName.</Text>
       ) : null}
+
       <Pressable
         style={styles.clickButton}
         onPress={() => {
           const missingUserName = !userName.trim();
           const missingMssv = !mssv.trim();
-          setErrors({ userName: missingUserName, mssv: missingMssv });
-          if (missingUserName || missingMssv) {
+
+          // Regular Expression kiểm tra định dạng MSSV
+          const mssvRegex = /^B[A-Z]{2}(2[2-6])[0-9]{4}$/;
+
+          const invalidMssvFormat = !missingMssv && !mssvRegex.test(mssv);
+
+          setErrors({
+            userName: missingUserName,
+            mssv: missingMssv,
+            mssvFormat: invalidMssvFormat,
+          });
+
+          if (missingUserName || missingMssv || invalidMssvFormat) {
             return;
           }
+
           setScreen(2);
         }}
       >
@@ -102,24 +139,29 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: "#FFFFFF",
   },
+
   blockVertical: {
     flex: 2.2,
   },
+
   blockHorizontal: {
     flex: 2.2,
     flexDirection: "row",
     marginTop: 2,
   },
+
   box: {
     flex: 1,
     margin: 3,
     justifyContent: "center",
     alignItems: "center",
   },
+
   textNumber: {
     fontSize: 36,
     fontWeight: "bold",
   },
+
   studentInfo: {
     textAlign: "center",
     paddingBottom: 8,
@@ -127,6 +169,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
   },
+
   clickButton: {
     alignSelf: "center",
     backgroundColor: "#1E88E5",
@@ -135,11 +178,13 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginBottom: 8,
   },
+
   clickButtonText: {
     color: "#171616",
     fontSize: 16,
     fontWeight: "bold",
   },
+
   backButton: {
     alignSelf: "flex-start",
     backgroundColor: "#df640c",
@@ -148,11 +193,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
   },
+
   backArrow: {
     color: "#FFFFFF",
     fontSize: 25,
     fontWeight: "bold",
   },
+
   input: {
     borderWidth: 1,
     borderColor: "#111010",
@@ -162,17 +209,20 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginBottom: 8,
   },
+
   errorText: {
     color: "#E53935",
     textAlign: "center",
     marginBottom: 6,
   },
+
   infoContainer: {
     flex: 1,
     padding: 16,
     justifyContent: "center",
     alignItems: "center",
   },
+
   infoText: {
     fontSize: 18,
     marginBottom: 8,
